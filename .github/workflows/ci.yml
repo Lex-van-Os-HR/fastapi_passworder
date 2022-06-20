@@ -18,6 +18,8 @@ jobs:
         run: flake8 ./
       - name: Run unittests
         run: python3 -m unittest discover .
+      - name: Docker login
+        run: docker login -u=lexus010 -p=LvOHRSoftwaremann471!
       - name: Build Docker image
         run: docker build -t lexus010/fastapi_passworder:v1 .
       - name: Build Docker image

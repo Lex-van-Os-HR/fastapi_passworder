@@ -32,7 +32,6 @@ with open("settings.yaml") as settings_file:
 
     # if path_exists:
     #     logging.info("Directory exists")
-
     # elif not path_exists:
     #     os.makedirs(logger_path)
     #     logging.info('Logging directory set')
