@@ -1,7 +1,12 @@
+from asyncio.log import logger
 import traceback
 import uvicorn
 import yaml
+import logging
+import socket
 from typing import Optional
+import sys
+import os
 
 from fastapi import FastAPI, HTTPException
 
@@ -19,12 +24,54 @@ class EncryptRequest(BaseModel):
 
 with open("settings.yaml") as settings_file:
     settings = yaml.safe_load(settings_file)
+    docker_volume_config = settings['logging_directory'] + "passworder_logger.log"
+
+    # dynamic load log location
+    # logger_path = settings['logging_directory']
+    # path_exists = os.path.exists(logger_path)
+
+    # if path_exists:
+    #     logging.info("Directory exists")
+
+    # elif not path_exists:
+    #     os.makedirs(logger_path)
+    #     logging.info('Logging directory set')
+        
 main_parameters = {}
 if not settings["openapi_console"]:
     main_parameters["docs_url"] = None
 
 app = FastAPI(**main_parameters)
 passworder = Passworder()
+
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+
+# Creating logger
+passworder_logger = logging.getLogger('passworder_logger')
+passworder_logger.setLevel(logging.INFO)
+
+# Creating logger handlers
+passworder_file_handler = logging.FileHandler(docker_volume_config)
+passworder_file_handler.setLevel(logging.INFO)
+
+# Creating logger formatters
+passworder_file_formatter = logging.Formatter('%(levelname)s: %(asctime)s %(message)s')
+passworder_file_handler.setFormatter(passworder_file_formatter)
+
+# Adding handlers to logger
+passworder_logger.addHandler(passworder_file_handler)
+
+def log_request(status_code, encryption_method):
+    print("Logging passworder request...")
+
+    # Get IP adress
+    hostname=socket.gethostname()   
+    ipAdress=socket.gethostbyname(hostname)   
+
+    message = str(status_code) + " " + str(ipAdress) + " " + encryption_method
+    passworder_logger.info(message) 
+    print("Done logging")
 
 
 @app.get("/encrypt/generators")
@@ -48,8 +95,10 @@ async def encrypt(encrypt_request: EncryptRequest):
     try:
         # Request validation steps..
         if not encrypt_request.cleartext:
+            log_request(400, encrypt_request.algorithm)
             raise HTTPException(status_code=400, detail="Missing cleartext entry to encrypt")
         if not encrypt_request.random_salt and not encrypt_request.salt:
+            log_request(400, encrypt_request.algorithm)
             raise HTTPException(status_code=400, detail="Either random salt or a set salt should be given")
 
         parameters = encrypt_request.dict()
@@ -66,13 +115,18 @@ async def encrypt(encrypt_request: EncryptRequest):
             "shadow_string": shadow_string,
             "salt": parameters["salt"],
         }
+
+        log_request(200, encrypt_request.algorithm)
+
     except HTTPException as e:
         # Raising the HTTP exception here, otherwise it will be picked up by
         # the generic exception handler
+        log_request(404, encrypt_request.algorithm)
         raise e
     except Exception as e:
         print(e)
         traceback.print_exc()
+        log_request(503, encrypt_request.algorithm)
         raise HTTPException(status_code=503, detail=str(e))
     finally:
         return result

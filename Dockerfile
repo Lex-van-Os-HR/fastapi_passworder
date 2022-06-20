@@ -4,4 +4,5 @@ WORKDIR /app
 COPY ./requirements.txt /tmp
 RUN pip install --upgrade -r /tmp/requirements.txt
 COPY ./passworder /app
+EXPOSE 8000
 CMD ["python", "main.py"]

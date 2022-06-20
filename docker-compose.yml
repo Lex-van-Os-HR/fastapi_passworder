@@ -3,6 +3,8 @@ services:
   passworder:
     build: .
     ports:
-      - "80:8000"
+      - "8000:8000"
+    volumes:
+      - /tmp/fastapi/
   redis:
     image: "redis:alpine"
