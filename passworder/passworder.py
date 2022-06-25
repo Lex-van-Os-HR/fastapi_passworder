@@ -1,5 +1,5 @@
 import base64
-import hashlib, secrets
+import secrets
 import generators
 
 
@@ -26,13 +26,15 @@ class Passworder:
             algorithm = self.DEFAULT_ALGO
         if algorithm not in self.ALGO_MAP:
             raise ValueError(
-                f"Incorrect algorithm, one of {', '.join(self.ALGO_MAP)} is required."
+    f"Incorrect algorithm, one of {', '.join(self.ALGO_MAP)} is required."
             )
         generator = self.ALGO_MAP[algorithm]()
         return generator.hash(cleartext, salt)
 
-    def verify_password(self, password, hash_digest, salt=None, algorithm=None):
+    def verify_password(self, password, hash_digest, salt=None,
+     algorithm=None):
         if not algorithm:
             algorithm = self.DEFAULT_ALGO
-        hashed_pw = self.get_password_hash(password, salt=salt, algorithm=algorithm)
+        hashed_pw = self.get_password_hash(password,
+         salt=salt, algorithm=algorithm)
         return secrets.compare_digest(hashed_pw, hash_digest)

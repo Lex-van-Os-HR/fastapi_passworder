@@ -1,11 +1,9 @@
-from asyncio.log import logger
 import traceback
 import uvicorn
 import yaml
 import logging
 import socket
 from typing import Optional
-import sys
 
 from fastapi import FastAPI, HTTPException
 
@@ -23,7 +21,8 @@ class EncryptRequest(BaseModel):
 
 with open("settings.yaml") as settings_file:
     settings = yaml.safe_load(settings_file)
-    docker_volume_config = settings['logging_directory'] + "passworder_logger.log"
+    docker_volume_config = settings['logging_directory'] + "\
+        passworder_logger.log"
 
     # dynamic load log location
     # logger_path = settings['logging_directory']
@@ -54,11 +53,13 @@ passworder_file_handler = logging.FileHandler(docker_volume_config)
 passworder_file_handler.setLevel(logging.INFO)
 
 # Creating logger formatters
-passworder_file_formatter = logging.Formatter('%(levelname)s: %(asctime)s %(message)s')
+passworder_file_formatter = logging.Formatter(
+    '%(levelname)s: %(asctime)s %(message)s')
 passworder_file_handler.setFormatter(passworder_file_formatter)
 
 # Adding handlers to logger
 passworder_logger.addHandler(passworder_file_handler)
+
 
 def log_request(status_code, encryption_method):
     print("Logging passworder request...")
@@ -85,7 +86,10 @@ async def show_version():
             version = version.strip()
         return {"version": version}
     except FileNotFoundError as e:
-        raise HTTPException(status_code=503, detail="Version file missing or not readeable")
+        print(e)
+        raise HTTPException(status_code=503,
+         detail="Version file missing or not readeable")
+
 
 @app.post("/encrypt/")
 async def encrypt(encrypt_request: EncryptRequest):
@@ -94,10 +98,12 @@ async def encrypt(encrypt_request: EncryptRequest):
         # Request validation steps..
         if not encrypt_request.cleartext:
             log_request(400, encrypt_request.algorithm)
-            raise HTTPException(status_code=400, detail="Missing cleartext entry to encrypt")
+            raise HTTPException(status_code=400,
+             detail="Missing cleartext entry to encrypt")
         if not encrypt_request.random_salt and not encrypt_request.salt:
             log_request(400, encrypt_request.algorithm)
-            raise HTTPException(status_code=400, detail="Either random salt or a set salt should be given")
+            raise HTTPException(status_code=400,
+             detail="Either random salt or a set salt should be given")
 
         parameters = encrypt_request.dict()
 
@@ -131,5 +137,6 @@ async def encrypt(encrypt_request: EncryptRequest):
 
 
 if __name__ == '__main__':
-    uvicorn.run(app="main:app", reload=settings["reload"], host=settings["listen_address"],
+    uvicorn.run(app="main:app", reload=settings["reload"],
+     host=settings["listen_address"],
                 port=settings["listen_port"])

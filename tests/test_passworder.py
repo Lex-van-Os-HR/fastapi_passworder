@@ -1,10 +1,12 @@
-import unittest
-from unittest import TestCase
-import sys, os
-
-sys.path.insert(0, os.path.dirname(__file__))
 from passworder import Passworder
 from random_password import get_random_password, get_random_salt
+import unittest
+from unittest import TestCase
+import sys
+import os
+
+sys.path.insert(0, os.path.dirname(__file__))
+
 
 
 class TestRandomPassword(TestCase):
@@ -19,8 +21,10 @@ class TestPassWorder(TestCase):
 
     def test_get_password_hash(self):
         random_password = get_random_password()
-        random_hash2 = self.passworder.get_password_hash(cleartext=random_password)
-        self.assertTrue(self.passworder.verify_password(random_password, random_hash2))
+        random_hash2 = self.passworder.get_password_hash(
+            cleartext=random_password)
+        self.assertTrue(self.passworder.verify_password(
+            random_password, random_hash2))
 
     def test_get_password_hash_salt(self):
         random_password = get_random_password()
@@ -29,7 +33,8 @@ class TestPassWorder(TestCase):
             cleartext=random_password, salt=random_salt
         )
         self.assertTrue(
-            self.passworder.verify_password(random_password, random_hash2, random_salt)
+            self.passworder.verify_password(
+                random_password, random_hash2, random_salt)
         )
 
     def test_generators(self):
