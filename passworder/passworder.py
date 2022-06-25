@@ -36,6 +36,6 @@ class Passworder:
                         algorithm=None):
         if not algorithm:
             algorithm = self.DEFAULT_ALGO
-        hashed_pw = self.get_password_hash(password,salt=salt,
+        hashed_pw = self.get_password_hash(password,salt=salt, 
                                             algorithm=algorithm)
         return secrets.compare_digest(hashed_pw, hash_digest)
