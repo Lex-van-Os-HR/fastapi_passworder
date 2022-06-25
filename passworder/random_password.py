@@ -19,7 +19,8 @@ def get_random_password(length=DEFAULT_LENGTH, chars=CHARS_LETTERS, seed=None):
         random_generator = random.SystemRandom()
     else:
         random_generator = random.Random(seed)
-    return "".join(random_generator.choice(chars) for character in range(length))
+    return "".join(random_generator.choice(chars) for character in range(
+                    length))
 
 
 def get_random_salt(length=8):

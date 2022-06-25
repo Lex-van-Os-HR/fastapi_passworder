@@ -33,7 +33,7 @@ with open("settings.yaml") as settings_file:
     # elif not path_exists:
     #     os.makedirs(logger_path)
     #     logging.info('Logging directory set')
-        
+
 main_parameters = {}
 if not settings["openapi_console"]:
     main_parameters["docs_url"] = None
@@ -65,7 +65,8 @@ def log_request(status_code, encryption_method):
     print("Logging passworder request...")
 
     # Get IP adress
-    hostname=socket.gethostname()   
+    hostname=socket.gethostname()
+
     ipAdress=socket.gethostbyname(hostname)   
 
     message = str(status_code) + " " + str(ipAdress) + " " + encryption_method
@@ -87,8 +88,8 @@ async def show_version():
         return {"version": version}
     except FileNotFoundError as e:
         print(e)
-        raise HTTPException(status_code=503,
-         detail="Version file missing or not readeable")
+        raise HTTPException(status_code=503, detail="Version file\
+                             missing or not readeable")
 
 
 @app.post("/encrypt/")
@@ -99,11 +100,11 @@ async def encrypt(encrypt_request: EncryptRequest):
         if not encrypt_request.cleartext:
             log_request(400, encrypt_request.algorithm)
             raise HTTPException(status_code=400,
-             detail="Missing cleartext entry to encrypt")
+                                detail="Missing cleartext entry to encrypt")
         if not encrypt_request.random_salt and not encrypt_request.salt:
             log_request(400, encrypt_request.algorithm)
-            raise HTTPException(status_code=400,
-             detail="Either random salt or a set salt should be given")
+            raise HTTPException(status_code=400,detail="Either random salt\
+                                 or a set salt should be given")
 
         parameters = encrypt_request.dict()
 
@@ -138,5 +139,5 @@ async def encrypt(encrypt_request: EncryptRequest):
 
 if __name__ == '__main__':
     uvicorn.run(app="main:app", reload=settings["reload"],
-     host=settings["listen_address"],
+                host=settings["listen_address"],
                 port=settings["listen_port"])
