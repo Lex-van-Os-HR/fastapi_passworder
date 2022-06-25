@@ -6,7 +6,6 @@ import logging
 import socket
 from typing import Optional
 import sys
-import os
 
 from fastapi import FastAPI, HTTPException
 
