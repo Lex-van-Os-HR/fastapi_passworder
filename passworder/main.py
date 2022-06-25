@@ -65,12 +65,13 @@ def log_request(status_code, encryption_method):
     print("Logging passworder request...")
 
     # Get IP adress
-    hostname=socket.gethostname()
 
-    ipAdress=socket.gethostbyname(hostname)   
+    hostname = socket.gethostname()
+
+    ipAdress = socket.gethostbyname(hostname)
 
     message = str(status_code) + " " + str(ipAdress) + " " + encryption_method
-    passworder_logger.info(message) 
+    passworder_logger.info(message)
     print("Done logging")
 
 
@@ -103,7 +104,7 @@ async def encrypt(encrypt_request: EncryptRequest):
                                 detail="Missing cleartext entry to encrypt")
         if not encrypt_request.random_salt and not encrypt_request.salt:
             log_request(400, encrypt_request.algorithm)
-            raise HTTPException(status_code=400,detail="Either random salt\
+            raise HTTPException(status_code=400, detail="Either random salt\
                                  or a set salt should be given")
 
         parameters = encrypt_request.dict()

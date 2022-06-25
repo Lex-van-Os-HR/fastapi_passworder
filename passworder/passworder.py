@@ -33,9 +33,9 @@ class Passworder:
         return generator.hash(cleartext, salt)
 
     def verify_password(self, password, hash_digest, salt=None,
-                    algorithm=None):
+                        algorithm=None):
         if not algorithm:
             algorithm = self.DEFAULT_ALGO
-        hashed_pw = self.get_password_hash(password,salt=salt, 
-                                           algorithm=algorithm)
+        hashed_pw = self.get_password_hash(password,salt=salt,
+                                            algorithm=algorithm)
         return secrets.compare_digest(hashed_pw, hash_digest)
